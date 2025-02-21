@@ -1,0 +1,1 @@
+# BlockNote-demo-nextjs-hocuspocus
