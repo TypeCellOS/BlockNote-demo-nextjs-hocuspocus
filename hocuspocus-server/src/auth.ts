@@ -1,4 +1,9 @@
-export function authInfoFromToken(token: string) {
+/**
+ * This is a fake implementation of authentication.
+ *
+ * It parses a token (like userid__READ-WRITE) and returns the userId and role.
+ */
+export function FAKE_authInfoFromToken(token: string) {
   const parts = token.split("__");
 
   if (parts.length !== 2) {

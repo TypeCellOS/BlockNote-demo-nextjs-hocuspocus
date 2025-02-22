@@ -2,8 +2,11 @@ import { DefaultThreadStoreAuth, YjsThreadStore } from "@blocknote/core";
 import { Document } from "@hocuspocus/server";
 import { Hono, Next } from "hono";
 import { createMiddleware } from "hono/factory";
-import { authInfoFromToken } from "./auth.js";
+import { FAKE_authInfoFromToken } from "./auth.js";
 
+// Middleware that parses the Authorization header and sets the userId and role
+// based on the token.
+// NOTE: This is a fake implementation for demo purposes.
 const authMiddleware = createMiddleware<{
   Variables: {
     userId: string;
@@ -18,7 +21,7 @@ const authMiddleware = createMiddleware<{
     return c.json({ error: "Unauthorized" });
   }
 
-  const authInfo = authInfoFromToken(parts[1]);
+  const authInfo = FAKE_authInfoFromToken(parts[1]);
 
   if (authInfo === "unauthorized") {
     c.status(401);
@@ -32,6 +35,7 @@ const authMiddleware = createMiddleware<{
   return;
 });
 
+// Middleware that based on the auth info creates a YjsThreadStore and makes it available to the request
 const threadStoreMiddleware = (options: { threadsMapKey: string }) =>
   createMiddleware<{
     Variables: {
@@ -55,6 +59,7 @@ const threadStoreMiddleware = (options: { threadsMapKey: string }) =>
     await next();
   });
 
+// The REST API that handles thread operations and executes them using the threadStore
 export const threadsRouter = (options: { threadsMapKey: string }) => {
   const router = new Hono<{
     Variables: {
@@ -93,7 +98,7 @@ export const threadsRouter = (options: { threadsMapKey: string }) => {
     const json = await c.req.json();
     // TODO: you'd probably validate the request json here
 
-    const comment = await c.get("threadStore").updateComment({
+    await c.get("threadStore").updateComment({
       threadId: c.req.param("threadId"),
       commentId: c.req.param("commentId"),
       ...json,
