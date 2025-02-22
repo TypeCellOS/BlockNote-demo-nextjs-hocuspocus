@@ -1,0 +1,50 @@
+{
+  "name": "hocuspocus-server",
+  "homepage": "https://github.com/TypeCellOS/BlockNote",
+  "private": true,
+  "license": "MPL-2.0",
+  "version": "0.0.1",
+  "files": [
+    "dist",
+    "types",
+    "src"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "vite-node src/index.ts",
+    "build": "tsc && vite build",
+    "start": "node dist/blocknote-xl-ai-server.js",
+    "lint": "eslint src --max-warnings 0",
+    "clean": "rimraf dist && rimraf types"
+  },
+  "dependencies": {
+    "@blocknote/core": "^0.24.1",
+    "@hono/node-ws": "^1.0.8",
+    "@hono/node-server": "^1.0.8",
+    "hono": "^4.7.2",
+    "@hocuspocus/server": "^2.15.2",
+    "@hocuspocus/extension-sqlite": "^2.15.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.10.0",
+    "prettier": "^2.7.1",
+    "rimraf": "^5.0.5",
+    "rollup-plugin-webpack-stats": "^0.2.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.3.4",
+    "vite-node": "^2.1.6",
+    "vite-plugin-eslint": "^1.8.1",
+    "vite-plugin-externalize-deps": "^0.8.0",
+    "vitest": "^2.0.3",
+    "undici": "^6",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "eslint-config-react-app": "^7.0.0",
+    "eslint-plugin-import": "^2.31.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      ".eslintrc.cjs"
+    ]
+  }
+}
