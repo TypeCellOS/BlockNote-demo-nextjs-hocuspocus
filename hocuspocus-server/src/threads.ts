@@ -3,7 +3,7 @@ import { Document } from "@hocuspocus/server";
 import { Hono, Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { FAKE_authInfoFromToken } from "./auth.js";
-
+import { setMark } from "./setMark.js";
 // Middleware that parses the Authorization header and sets the userId and role
 // based on the token.
 // NOTE: This is a fake implementation for demo purposes.
@@ -79,6 +79,22 @@ export const threadsRouter = (options: { threadsMapKey: string }) => {
 
     const thread = await c.get("threadStore").createThread(json);
     return c.json(thread);
+  });
+
+  // addToDocument
+  router.post("/:threadId/addToDocument", async (c) => {
+    const json = await c.req.json();
+    // TODO: you'd probably validate the request json here
+
+    const doc = c.get("document");
+    const fragment = doc.getXmlFragment("doc");
+
+    setMark(doc, fragment, json.selection.yjs, "comment", {
+      orphan: false,
+      threadId: c.req.param("threadId"),
+    });
+
+    return c.json({ message: "Thread added to document" });
   });
 
   // addComment

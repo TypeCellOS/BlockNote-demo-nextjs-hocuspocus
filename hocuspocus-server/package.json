@@ -23,7 +23,11 @@
     "@hono/node-server": "^1.0.8",
     "hono": "^4.7.2",
     "@hocuspocus/server": "^2.15.2",
-    "@hocuspocus/extension-sqlite": "^2.15.2"
+    "@hocuspocus/extension-sqlite": "^2.15.2",
+    "y-prosemirror": "^1.2.15",
+    "@blocknote/server-util": "^0.24.1",
+    "yjs": "^13.6.23",
+    "prosemirror-state": "^1.4.1"
   },
   "devDependencies": {
     "eslint": "^8.10.0",
