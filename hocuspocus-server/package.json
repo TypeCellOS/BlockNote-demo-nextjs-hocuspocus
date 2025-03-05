@@ -18,14 +18,17 @@
     "clean": "rimraf dist && rimraf types"
   },
   "dependencies": {
-    "@blocknote/core": "^0.24.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@blocknote/react": "^0.25.0",
+    "@blocknote/core": "^0.25.0",
     "@hono/node-ws": "^1.0.8",
     "@hono/node-server": "^1.0.8",
     "hono": "^4.7.2",
     "@hocuspocus/server": "^2.15.2",
     "@hocuspocus/extension-sqlite": "^2.15.2",
     "y-prosemirror": "^1.2.15",
-    "@blocknote/server-util": "^0.24.1",
+    "@blocknote/server-util": "^0.25.0",
     "yjs": "^13.6.23",
     "prosemirror-state": "^1.4.1"
   },
