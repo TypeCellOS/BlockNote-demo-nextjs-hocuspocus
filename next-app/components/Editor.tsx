@@ -1,5 +1,8 @@
 "use client"; // this registers <Editor> as a Client Component
-import { DefaultThreadStoreAuth, RESTYjsThreadStore } from "@blocknote/core";
+import {
+  DefaultThreadStoreAuth,
+  RESTYjsThreadStore,
+} from "@blocknote/core/comments";
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";

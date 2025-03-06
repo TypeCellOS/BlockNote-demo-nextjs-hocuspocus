@@ -1,4 +1,7 @@
-import { DefaultThreadStoreAuth, YjsThreadStore } from "@blocknote/core";
+import {
+  DefaultThreadStoreAuth,
+  YjsThreadStore,
+} from "@blocknote/core/comments";
 import { Document } from "@hocuspocus/server";
 import { Hono, Next } from "hono";
 import { createMiddleware } from "hono/factory";
@@ -50,7 +53,7 @@ const threadStoreMiddleware = (options: { threadsMapKey: string }) =>
       c.get("document").getMap(options.threadsMapKey),
       new DefaultThreadStoreAuth(
         c.get("userId"),
-        c.get("role") === "COMMENT-ONLY" ? "commenter" : "editor"
+        c.get("role") === "COMMENT-ONLY" ? "comment" : "editor"
       )
     );
 
