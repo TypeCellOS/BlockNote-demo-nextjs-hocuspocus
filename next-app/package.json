@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@hocuspocus/provider": "^2.15.2",
-    "@blocknote/core": "^0.25.0",
-    "@blocknote/mantine": "^0.25.0",
-    "@blocknote/react": "^0.25.0",
+    "@blocknote/core": "^0.25.1",
+    "@blocknote/mantine": "^0.25.1",
+    "@blocknote/react": "^0.25.1",
     "next": "15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
