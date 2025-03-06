@@ -18,36 +18,37 @@
     "clean": "rimraf dist && rimraf types"
   },
   "dependencies": {
+    "@blocknote/core": "^0.25.1",
+    "@blocknote/react": "^0.25.1",
+    "@blocknote/server-util": "^0.25.0",
+    "@hocuspocus/extension-sqlite": "^2.15.2",
+    "@hocuspocus/server": "^2.15.2",
+    "@hono/node-server": "^1.0.8",
+    "@hono/node-ws": "^1.0.8",
+    "@tiptap/core": "2.11.5",
+    "hono": "^4.7.2",
+    "prosemirror-state": "^1.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@blocknote/react": "^0.25.1",
-    "@blocknote/core": "^0.25.1",
-    "@hono/node-ws": "^1.0.8",
-    "@hono/node-server": "^1.0.8",
-    "hono": "^4.7.2",
-    "@hocuspocus/server": "^2.15.2",
-    "@hocuspocus/extension-sqlite": "^2.15.2",
     "y-prosemirror": "^1.2.15",
-    "@blocknote/server-util": "^0.25.0",
-    "yjs": "^13.6.23",
-    "prosemirror-state": "^1.4.1"
+    "yjs": "^13.6.23"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
     "eslint": "^8.10.0",
+    "eslint-config-react-app": "^7.0.0",
+    "eslint-plugin-import": "^2.31.0",
     "prettier": "^2.7.1",
     "rimraf": "^5.0.5",
     "rollup-plugin-webpack-stats": "^0.2.2",
     "typescript": "^5.3.3",
+    "undici": "^6",
     "vite": "^5.3.4",
     "vite-node": "^2.1.6",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-externalize-deps": "^0.8.0",
-    "vitest": "^2.0.3",
-    "undici": "^6",
-    "@typescript-eslint/eslint-plugin": "^5.5.0",
-    "@typescript-eslint/parser": "^5.5.0",
-    "eslint-config-react-app": "^7.0.0",
-    "eslint-plugin-import": "^2.31.0"
+    "vitest": "^2.0.3"
   },
   "eslintConfig": {
     "extends": [
