@@ -8,7 +8,7 @@ import { cors } from "hono/cors";
 import { createMiddleware } from "hono/factory";
 import { FAKE_authInfoFromToken } from "./auth.js";
 import { threadsRouter } from "./threads.js";
-
+import { RejectUnauthorized } from "./rejectUnauthorized.js";
 // Setup Hocuspocus server
 const hocuspocusServer = Server.configure({
   async onAuthenticate(data) {
@@ -27,6 +27,7 @@ const hocuspocusServer = Server.configure({
     new SQLite({
       database: "db.sqlite",
     }),
+    new RejectUnauthorized("threads"),
   ],
 
   // TODO: for good security, you'd want to make sure that either:
@@ -69,6 +70,7 @@ const documentMiddleware = createMiddleware<{
   c.set("document", document);
 
   await next();
+  return;
 });
 
 app.use("/documents/:documentId/*", documentMiddleware);
