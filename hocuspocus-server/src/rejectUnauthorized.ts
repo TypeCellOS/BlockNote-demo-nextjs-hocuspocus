@@ -38,16 +38,26 @@ export class RejectUnauthorized implements Extension {
     // Read the hocuspocusMessageType
     const hocuspocusMessageType = incomingMessage.readVarUint();
     // If the hocuspocusMessageType is not Sync, we don't handle the message, since it is not an update
-    if (hocuspocusMessageType !== MessageType.Sync) {
+    if (
+      !(
+        hocuspocusMessageType === MessageType.Sync ||
+        hocuspocusMessageType === MessageType.SyncReply
+      )
+    ) {
       return;
     }
 
     // Read the ySyncMessageType
     const ySyncMessageType = incomingMessage.readVarUint();
 
-    // If the ySyncMessageType is not messageYjsUpdate, we don't handle the message, since it is not an update
-    if (ySyncMessageType !== syncProtocol.messageYjsUpdate) {
-      // not an update
+    // If the ySyncMessageType is not a messageYjsUpdate or a messageYjsSyncStep2, we don't handle the message, since it is not an update
+    if (
+      !(
+        ySyncMessageType === syncProtocol.messageYjsUpdate ||
+        ySyncMessageType === syncProtocol.messageYjsSyncStep2
+      )
+    ) {
+      // not an update we want to handle
       return;
     }
 
@@ -72,7 +82,7 @@ export class RejectUnauthorized implements Extension {
    * @param restrictedType The type that we want to protect
    * @returns true if the update was rejected, false otherwise
    */
-  private rollbackUpdateIfNeeded(
+  private applyUpdateAndRollbackIfNeeded(
     yUpdate: Uint8Array,
     ydoc: Y.Doc,
     restrictedType: Y.AbstractType<any>
@@ -113,13 +123,13 @@ export class RejectUnauthorized implements Extension {
     }
 
     const protectedType = ydoc.getMap(this.threadsMapKey);
-    const didNeedToUndo = this.rollbackUpdateIfNeeded(
+    const didRollback = this.applyUpdateAndRollbackIfNeeded(
       yUpdate,
       ydoc,
       protectedType
     );
 
-    if (didNeedToUndo) {
+    if (didRollback) {
       // TODO, we can close their connection or just let them continue, since we've already undone their changes (and our changes are newer than theirs)
       const error = {
         reason: `Modification of a restricted type: ${this.threadsMapKey} was rejected`,
