@@ -8,11 +8,12 @@ import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
 import { HocuspocusProvider } from "@hocuspocus/provider";
+import { useEffect } from "react";
 
 // Hardcoded settings for demo purposes
 const USER_ID = "user123";
 const USER_ROLE: "COMMENT-ONLY" | "READ-WRITE" = "READ-WRITE";
-const DOCUMENT_ID = "mydoc123";
+const DOCUMENT_ID = "mydoc1234";
 const TOKEN = `${USER_ID}__${USER_ROLE}`;
 
 // Setup Hocuspocus provider
@@ -73,6 +74,57 @@ export default function Editor() {
     },
   });
 
+  useEffect(() => {
+    provider.document.on("update", (update) => {
+      console.log(provider.document.getMap("threads").toJSON());
+    });
+  }, [provider.document]);
+
   // Renders the editor instance using a React component.
-  return <BlockNoteView editor={editor} />;
+  return (
+    <>
+      <button
+        onClick={() => {
+          const comments = provider.document.getMap("threads");
+          comments.set("unauthorized-thread", {
+            id: "unauthorized-thread",
+            createdAt: 1741265978860,
+            updatedAt: 1741265978860,
+            comments: [
+              {
+                id: "unauthorized-comment",
+                userId: "unauthorized-user",
+                createdAt: 1741265978860,
+                updatedAt: 1741265978860,
+                body: [
+                  {
+                    id: "unauthorized-comment-body",
+                    type: "paragraph",
+                    props: {},
+                    content: [
+                      {
+                        type: "text",
+                        text: "This comment should not be visible",
+                        styles: {},
+                      },
+                    ],
+                    children: [],
+                  },
+                ],
+                reactionsByUser: {},
+              },
+            ],
+            resolved: false,
+          });
+        }}
+      >
+        Unauthorized comment modification
+      </button>
+      <p>
+        Pressing the button above will add a new comment to the threads map, but
+        this change will be rejected by the server.
+      </p>
+      <BlockNoteView editor={editor} />
+    </>
+  );
 }
