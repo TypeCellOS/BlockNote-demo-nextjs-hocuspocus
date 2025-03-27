@@ -1,9 +1,6 @@
-import type { CloseEvent } from "@hocuspocus/common";
 import {
-  beforeHandleMessagePayload,
-  Extension,
-  IncomingMessage,
-  MessageType,
+  type beforeSyncPayload,
+  Extension
 } from "@hocuspocus/server";
 import * as syncProtocol from "y-protocols/sync";
 import * as Y from "yjs";
@@ -18,55 +15,7 @@ import * as Y from "yjs";
  * - if the update is accepted, we do nothing
  */
 export class RejectUnauthorized implements Extension {
-  constructor(private readonly threadsMapKey: string) {}
-  /**
-   * Extract the yjsUpdate from the incoming message
-   * @param message
-   * @returns
-   */
-  private getYUpdate(message: Uint8Array) {
-    /**
-     * The messages we are interested in are of the following format:
-     * [docIdLength: number, ...docIdString: string, hocuspocusMessageType: number,  ySyncMessageType: number, ...yjsUpdate: Uint8Array]
-     *
-     * We check that the hocuspocusMessageType is Sync and that the ySyncMessageType is messageYjsUpdate.
-     */
-    const incomingMessage = new IncomingMessage(message);
-    // Read the docID string, but don't use it
-    incomingMessage.readVarString();
-
-    // Read the hocuspocusMessageType
-    const hocuspocusMessageType = incomingMessage.readVarUint();
-    // If the hocuspocusMessageType is not Sync, we don't handle the message, since it is not an update
-    if (
-      !(
-        hocuspocusMessageType === MessageType.Sync ||
-        hocuspocusMessageType === MessageType.SyncReply
-      )
-    ) {
-      return;
-    }
-
-    // Read the ySyncMessageType
-    const ySyncMessageType = incomingMessage.readVarUint();
-
-    // If the ySyncMessageType is not a messageYjsUpdate or a messageYjsSyncStep2, we don't handle the message, since it is not an update
-    if (
-      !(
-        ySyncMessageType === syncProtocol.messageYjsUpdate ||
-        ySyncMessageType === syncProtocol.messageYjsSyncStep2
-      )
-    ) {
-      // not an update we want to handle
-      return;
-    }
-
-    // Read the yjsUpdate
-    const yUpdate = incomingMessage.readVarUint8Array();
-
-    return yUpdate;
-  }
-
+  constructor(private readonly threadsMapKey: string, private readonly onReject?: (payload: beforeSyncPayload) => void) {}
   /**
    * This function protects against changes to the restricted type.
    * It does this by:
@@ -112,29 +61,31 @@ export class RejectUnauthorized implements Extension {
     return didNeedToUndo;
   }
 
-  async beforeHandleMessage({
-    update,
-    document: ydoc,
-  }: beforeHandleMessagePayload) {
-    const yUpdate = this.getYUpdate(update);
-
-    if (!yUpdate) {
+  /**
+   * Before the document is synchronized, we check if the update modifies the restricted type.
+   * If it does, we reject the update by undoing it, and calling the onReject callback.
+   */
+  async beforeSync(data: beforeSyncPayload) {
+    // If the ySyncMessageType is not a messageYjsUpdate or a messageYjsSyncStep2, we don't handle the message, since it is not an update
+    if (
+      !(
+        data.type === syncProtocol.messageYjsUpdate ||
+        data.type === syncProtocol.messageYjsSyncStep2
+      )
+    ) {
+      // not an update we want to handle
       return;
     }
 
-    const protectedType = ydoc.getMap(this.threadsMapKey);
+    const protectedType = data.document.getMap(this.threadsMapKey);
     const didRollback = this.applyUpdateAndRollbackIfNeeded(
-      yUpdate,
-      ydoc,
+      data.payload,
+      data.document,
       protectedType
     );
 
     if (didRollback) {
-      // TODO, we can close their connection or just let them continue, since we've already undone their changes (and our changes are newer than theirs)
-      const error = {
-        reason: `Modification of a restricted type: ${this.threadsMapKey} was rejected`,
-      } satisfies Partial<CloseEvent>;
-      throw error;
+      this.onReject?.(data)
     }
   }
 }
