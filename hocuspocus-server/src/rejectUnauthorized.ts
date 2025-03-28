@@ -1,7 +1,4 @@
-import {
-  type beforeSyncPayload,
-  Extension
-} from "@hocuspocus/server";
+import { type beforeSyncPayload, Extension } from "@hocuspocus/server";
 import * as syncProtocol from "y-protocols/sync";
 import * as Y from "yjs";
 
@@ -15,7 +12,10 @@ import * as Y from "yjs";
  * - if the update is accepted, we do nothing
  */
 export class RejectUnauthorized implements Extension {
-  constructor(private readonly threadsMapKey: string, private readonly onReject?: (payload: beforeSyncPayload) => void) {}
+  constructor(
+    private readonly threadsMapKey: string,
+    private readonly onReject?: (payload: beforeSyncPayload) => void
+  ) {}
   /**
    * This function protects against changes to the restricted type.
    * It does this by:
@@ -85,7 +85,7 @@ export class RejectUnauthorized implements Extension {
     );
 
     if (didRollback) {
-      this.onReject?.(data)
+      this.onReject?.(data);
     }
   }
 }
