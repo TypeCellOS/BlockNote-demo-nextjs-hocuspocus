@@ -1,5 +1,5 @@
 import { SQLite } from "@hocuspocus/extension-sqlite";
-import { Document, Server } from "@hocuspocus/server";
+import { type Document, Hocuspocus } from "@hocuspocus/server";
 
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
@@ -10,7 +10,8 @@ import { FAKE_authInfoFromToken } from "./auth.js";
 import { threadsRouter } from "./threads.js";
 import { RejectUnauthorized } from "./rejectUnauthorized.js";
 // Setup Hocuspocus server
-const hocuspocusServer = Server.configure({
+
+const hocuspocus = new Hocuspocus({
   async onAuthenticate(data) {
     const { token } = data;
 
@@ -19,15 +20,19 @@ const hocuspocusServer = Server.configure({
     if (authInfo === "unauthorized") {
       throw new Error("Not authorized!");
     }
-
-    data.connection.readOnly = authInfo.role === "COMMENT-ONLY";
+    
+    data.connectionConfig.readOnly = authInfo.role === "COMMENT-ONLY";
   },
 
   extensions: [
     new SQLite({
-      database: "db.sqlite",
+      database: ":memory:",
     }),
-    new RejectUnauthorized("threads"),
+    // TODO we can actually just do the auth check in here, and not need the server to inject the mark or anything
+    new RejectUnauthorized("threads", (payload) => {
+      // eslint-disable-next-line no-console
+      console.warn("rejecting update to document", payload.documentName);
+    }),
   ],
 
   // TODO: for good security, you'd want to make sure that either:
@@ -46,7 +51,7 @@ app.get(
   "/hocuspocus",
   upgradeWebSocket((c) => ({
     onOpen(_evt, ws) {
-      hocuspocusServer.handleConnection(ws.raw, c.req.raw);
+      hocuspocus.handleConnection(ws.raw, c.req.raw as any);
     },
   }))
 );
@@ -61,7 +66,7 @@ const documentMiddleware = createMiddleware<{
   };
 }>(async (c, next) => {
   const documentId = c.req.param("documentId");
-  const document = hocuspocusServer.documents.get(documentId!);
+  const document = hocuspocus.documents.get(documentId!);
 
   if (!document) {
     return c.json({ error: "Document not found" }, 404);
@@ -85,6 +90,12 @@ app.route(
 const server = serve({
   fetch: app.fetch,
   port: 8787,
+}, (info) => {
+  hocuspocus.hooks('onListen', {
+    instance: hocuspocus,
+    configuration: hocuspocus.configuration,
+    port: info.port
+  })
 });
 
 // Setup WebSocket support (needed for HocusPocus)
