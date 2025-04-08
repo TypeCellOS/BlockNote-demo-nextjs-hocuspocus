@@ -68,7 +68,7 @@ const documentMiddleware = createMiddleware<{
 
   c.set("document", document);
 
-  await next();
+  return await next();
 });
 
 app.use("/documents/:documentId/*", documentMiddleware);

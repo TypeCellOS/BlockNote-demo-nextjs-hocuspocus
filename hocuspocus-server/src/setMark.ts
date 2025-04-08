@@ -1,3 +1,4 @@
+import { CommentMark } from "@blocknote/core/comments";
 import { ServerBlockNoteEditor } from "@blocknote/server-util";
 import { Document } from "@hocuspocus/server";
 import { EditorState, TextSelection } from "prosemirror-state";
@@ -23,10 +24,12 @@ export function setMark(
 ) {
   // needed to get the pmSchema
   // if you use a BlockNote custom schema, make sure to pass it to the create options
-  const editor = ServerBlockNoteEditor.create();
+  const editor = ServerBlockNoteEditor.create({
+    _extensions: { comment: CommentMark },
+  });
 
   // get the prosemirror document
-  const { doc: pNode, mapping } = initProseMirrorDoc(
+  const { doc: pNode, meta } = initProseMirrorDoc(
     fragment,
     editor.editor.pmSchema as any
   );
@@ -37,13 +40,13 @@ export function setMark(
     doc,
     fragment,
     yjsSelection.anchor,
-    mapping
+    meta.mapping
   );
   const head = relativePositionToAbsolutePosition(
     doc,
     fragment,
     yjsSelection.head,
-    mapping
+    meta.mapping
   );
 
   // now, let's create the mark in the prosemirror document
@@ -60,7 +63,7 @@ export function setMark(
   );
 
   // finally, update the yjs document with the new prosemirror document
-  updateYFragment(doc, fragment, tr.doc, mapping);
+  updateYFragment(doc, fragment, tr.doc, meta);
 }
 
 // based on https://github.com/ueberdosis/tiptap/blob/f3258d9ee5fb7979102fe63434f6ea4120507311/packages/core/src/commands/setMark.ts#L66
